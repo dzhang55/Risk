@@ -19,25 +19,22 @@ public class Board extends JPanel{
     public static Map<Integer, Set<Country>> continents;
     public static final int[] continentBonuses = {5, 2, 5, 3, 7, 2};
     Country[] countries;
-    public static final int BOARD_WIDTH = 1000;
-    public static final int BOARD_HEIGHT = 512;
+    public static final int BOARD_WIDTH = 900;
+    public static final int BOARD_HEIGHT = 600;
     public static final Color[] colors = {Color.BLUE, Color.RED, Color.YELLOW, Color.GREEN};
     
+    enum Mode {
+        PlacingMode, AttackFromMode, AttackToMode, NewCountryMode, ReinforceMode
+    }
+    
+    private Mode mode = Mode.PlacingMode;
+    
     public Board() {
-        countries = new Country[9];
-        countries[0] = new Country("Alaska", 30, 30, 80, 60);
-        countries[1] = new Country("Alberta", 110, 80, 90, 50);
-        countries[2] = new Country("Central America", 140, 220, 60, 50);
-        countries[3] = new Country("Eastern United States", 180, 130, 70, 90);
-        countries[4] = new Country("Greenland", 250, 250, 50, 50);
-        countries[5] = new Country("Northwest Territory", 110, 30, 120, 50);
-        countries[6] = new Country("Ontario", 200, 80, 50, 50);
-        countries[7] = new Country("Quebec", 250, 250, 50, 50);
-        countries[8] = new Country("Western United States", 110, 130, 70, 90);
-        countries[9] = new Country("Argentina", 250, 250, 50, 50);
+        
+        initializeCountries();       
         
         continents = new TreeMap<Integer, Set<Country>>();
-        for (int i = 0; i < continents.size(); i++) {
+        for (int i = 0; i < 2; i++) {
             continents.put(i, new TreeSet<Country>());
         }
         Set<Country> thisContinent = continents.get(0);
@@ -48,27 +45,33 @@ public class Board extends JPanel{
         for (int i = 9; i < 13; i++) {
             thisContinent.add(countries[i]);
         }
-        thisContinent = continents.get(2);
-        for (int i = 13; i < 20; i++) {
-            thisContinent.add(countries[i]);
-        }
-        thisContinent = continents.get(3);
-        for (int i = 20; i < 26; i++) {
-            thisContinent.add(countries[i]);
-        }
-        thisContinent = continents.get(4);
-        for (int i = 26; i < 38; i++) {
-            thisContinent.add(countries[i]);
-        }
-        thisContinent = continents.get(5);
-        for (int i = 38; i < 42; i++) {
-            thisContinent.add(countries[i]);
-        }
+//        thisContinent = continents.get(2);
+//        for (int i = 13; i < 20; i++) {
+//            thisContinent.add(countries[i]);
+//        }
+//        thisContinent = continents.get(3);
+//        for (int i = 20; i < 26; i++) {
+//            thisContinent.add(countries[i]);
+//        }
+//        thisContinent = continents.get(4);
+//        for (int i = 26; i < 38; i++) {
+//            thisContinent.add(countries[i]);
+//        }
+//        thisContinent = continents.get(5);
+//        for (int i = 38; i < 42; i++) {
+//            thisContinent.add(countries[i]);
+//        }
         
-        initialCountries(4);
+        initialCountryOwners(4);
 
         addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
+                switch (mode) {
+                case PlacingMode: 
+                    break;
+                default: 
+                    break;
+                }
                 Point mouse = e.getPoint();
                 for (Country c : countries) {
                     if (c.inBounds(mouse)) {
@@ -82,6 +85,53 @@ public class Board extends JPanel{
 
     }
     
+    private void initializeCountries() {
+        countries = new Country[42];
+        countries[0] = new Country("Alaska", 30, 30, 80, 60);
+        countries[1] = new Country("Alberta", 110, 80, 90, 50);
+        countries[2] = new Country("Central America", 140, 210, 60, 60);
+        countries[3] = new Country("Eastern United States", 180, 130, 70, 80);
+        countries[4] = new Country("Greenland", 280, 20, 80, 60);
+        countries[5] = new Country("Northwest Territory", 110, 30, 120, 50);
+        countries[6] = new Country("Ontario", 200, 80, 50, 50);
+        countries[7] = new Country("Quebec", 250, 90, 50, 70);
+        countries[8] = new Country("Western United States", 110, 130, 70, 80);
+        countries[9] = new Country("Venezuela", 200, 270, 70, 50);
+        countries[10] = new Country("Brazil", 230, 320, 90, 120);
+        countries[11] = new Country("Peru", 190, 320, 40, 120);
+        countries[12] = new Country("Argentina", 200, 440, 70, 100);
+        countries[13] = new Country("Great Britain", 400, 110, 20, 40);
+        countries[14] = new Country("Iceland", 370, 90, 20, 20);
+        countries[15] = new Country("Northern Europe", 440, 140, 60, 40);
+        countries[16] = new Country("Scandinavia", 450, 20, 50, 100);
+        countries[17] = new Country("Ukraine", 500, 70, 100, 110);
+        countries[18] = new Country("Southern Europe", 440, 180, 80, 40);
+        countries[19] = new Country("Western Europe", 380, 160, 60, 40);
+        countries[20] = new Country("Madagascar", 540, 400, 20, 40);
+        countries[21] = new Country("Egypt", 450, 240, 70, 40);
+        countries[22] = new Country("North Africa", 360, 240, 90, 90);
+        countries[23] = new Country("East Africa", 450, 280, 80, 110);
+        countries[24] = new Country("Congo", 390, 330, 60, 60);
+        countries[25] = new Country("South Africa", 420, 390, 80, 110);
+        countries[26] = new Country("Middle East", 520, 180, 110, 70);
+        countries[27] = new Country("Afghanistan", 600, 110, 70, 70);
+        countries[28] = new Country("Ural", 600, 55, 80, 55);
+        countries[29] = new Country("India", 630, 180, 60, 100);
+        countries[30] = new Country("China", 670, 110, 90, 70);
+        countries[31] = new Country("Siberia", 680, 35, 30, 75);
+        countries[32] = new Country("Siam", 690, 180, 40, 70);
+        countries[33] = new Country("Mongolia", 710, 80, 60, 30);
+        countries[34] = new Country("Irkutsk", 710, 55, 60, 25);
+        countries[35] = new Country("Yakutsk", 710, 30, 60, 25);
+        countries[36] = new Country("Kamchatka", 770, 30, 30, 70);
+        countries[37] = new Country("Japan", 810, 80, 20, 40);
+        countries[38] = new Country("Indonesia", 750, 290, 30, 30);
+        countries[39] = new Country("Western Australia", 760, 350, 60, 70);
+        countries[40] = new Country("Eastern Australia", 820, 350, 50, 70);
+        countries[41] = new Country("New Guinea", 820, 300, 40, 25);
+        
+    }
+    
     private Country[] shuffle() {
         Country[] shuffledCountries = countries.clone();
         for (int i = 0; i < countries.length; i++) {
@@ -93,7 +143,7 @@ public class Board extends JPanel{
         return shuffledCountries;
     }
     
-    public void initialCountries(int numPlayers) {
+    public void initialCountryOwners(int numPlayers) {
         int playerID = 0;
         Country[] shuffledCountries = shuffle();
         for (int i = 0; i < countries.length; i++) {
@@ -117,7 +167,7 @@ public class Board extends JPanel{
     
     public static void main(String args[]) {
         Board board = new Board();
-        board.shuffle();
+        //board.initialCountries(4);
         for (int i = 0; i < board.countries.length; i++) {
             System.out.println(board.countries[i].getName());
         }

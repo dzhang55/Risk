@@ -4,7 +4,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.util.List;
 
-public class Country {
+public class Country implements Comparable<Country> {
     List<Country> adjacentCountries;
     private String name;
     int ownerID;
@@ -71,6 +71,10 @@ public class Country {
             return false;
         }
         return true;
+    }
+    
+    public int compareTo(Country c) {
+        return name.compareTo(c.name);
     }
     
 
