@@ -88,14 +88,14 @@ public class Board extends JPanel{
     private void initializeCountries() {
         countries = new Country[42];
         countries[0] = new Country("Alaska", 30, 30, 80, 60);
-        countries[1] = new Country("Alberta", 110, 80, 90, 50);
-        countries[2] = new Country("Central America", 140, 210, 60, 60);
-        countries[3] = new Country("Eastern United States", 180, 130, 70, 80);
+        countries[1] = new Country("Alberta", 110, 80, 80, 50);
+        countries[2] = new Country("Central America", 140, 210, 65, 60);
+        countries[3] = new Country("Eastern United States", 200, 130, 50, 80);
         countries[4] = new Country("Greenland", 280, 20, 80, 60);
         countries[5] = new Country("Northwest Territory", 110, 30, 120, 50);
-        countries[6] = new Country("Ontario", 200, 80, 50, 50);
+        countries[6] = new Country("Ontario", 190, 80, 60, 50);
         countries[7] = new Country("Quebec", 250, 90, 50, 70);
-        countries[8] = new Country("Western United States", 110, 130, 70, 80);
+        countries[8] = new Country("Western United States", 110, 130, 90, 80);
         countries[9] = new Country("Venezuela", 200, 270, 70, 50);
         countries[10] = new Country("Brazil", 230, 320, 90, 120);
         countries[11] = new Country("Peru", 190, 320, 40, 120);
@@ -125,10 +125,10 @@ public class Board extends JPanel{
         countries[35] = new Country("Yakutsk", 710, 30, 60, 25);
         countries[36] = new Country("Kamchatka", 770, 30, 30, 70);
         countries[37] = new Country("Japan", 810, 80, 20, 40);
-        countries[38] = new Country("Indonesia", 750, 290, 30, 30);
-        countries[39] = new Country("Western Australia", 760, 350, 60, 70);
-        countries[40] = new Country("Eastern Australia", 820, 350, 50, 70);
-        countries[41] = new Country("New Guinea", 820, 300, 40, 25);
+        countries[38] = new Country("Indonesia", 730, 300, 30, 30);
+        countries[39] = new Country("Western Australia", 740, 360, 60, 70);
+        countries[40] = new Country("Eastern Australia", 800, 360, 50, 70);
+        countries[41] = new Country("New Guinea", 800, 310, 40, 25);
         
     }
     
@@ -158,6 +158,34 @@ public class Board extends JPanel{
         for(Country c : countries) {
             c.draw(g);   
         }
+        
+        g.drawLine(0, 60, 30, 60);
+        g.drawLine(800, 60, 900, 60);
+        
+        g.drawLine(230, 55, 280, 50);
+        g.drawLine(250, 80, 280, 50);
+        g.drawLine(300, 90, 310, 80);
+        g.drawLine(360, 80, 370, 90);
+        g.drawLine(390, 95, 410, 110);
+        g.drawLine(410, 150, 410, 160);
+        g.drawLine(410, 110, 450, 70);
+        g.drawLine(420, 130, 440, 140);
+        g.drawLine(475, 120, 470, 140);
+        g.drawLine(480, 220, 485, 240);
+        g.drawLine(440, 220, 405, 240);
+        g.drawLine(410, 200, 405, 240);
+        g.drawLine(530, 280, 575, 250);
+        g.drawLine(530, 390, 540, 400);
+        g.drawLine(500, 445, 540, 420);
+        g.drawLine(320, 320, 360, 285);
+        g.drawLine(810, 120, 770, 110);
+        g.drawLine(810, 80, 800, 65);
+        g.drawLine(710, 250, 745, 300);
+        g.drawLine(760, 315, 800, 323);
+        g.drawLine(745, 330, 770, 360);
+        g.drawLine(820, 335, 825, 360);
+        g.drawLine(770, 360, 800, 335);
+        
     }
 
     @Override

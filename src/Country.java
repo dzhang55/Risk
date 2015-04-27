@@ -14,6 +14,7 @@ public class Country implements Comparable<Country> {
     private int width;
     private int height;
     private boolean hover;
+    private boolean showName = true;
 
     public Country (String name, int x, int y, int width, int height) {
         this.name = name;
@@ -30,11 +31,27 @@ public class Country implements Comparable<Country> {
     public int getX() {
         return x;
     }
+    
+    public int getRightX() {
+        return x + width;
+    }
+    
+    public int getCenterX() {
+        return x + width / 2;
+    }
 
     public int getY() {
         return y;
     }
+    
+    public int getBottomY() {
+        return y + height;
+    }
 
+    public int getCenterY() {
+        return y + height / 2;
+    }
+    
     public int getWidth() {
         return width;
     }
@@ -54,6 +71,13 @@ public class Country implements Comparable<Country> {
         g.fillRect(x, y, width, height);
         g.setColor(Color.BLACK);
         g.drawRect(x, y, width, height);
+        if (showName) {
+            g.drawString(name, x, y + height / 2);
+        }
+    }
+    
+    public void toggleNameOrNum() {
+        showName = !showName;
     }
     
     public void highlight() {
