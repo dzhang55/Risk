@@ -15,7 +15,6 @@ public class Country implements Comparable<Country> {
     private int width;
     private int height;
     private boolean selected;
-    private boolean showName = false;
 
     public Country (String name, int x, int y, int width, int height) {
         this.name = name;
@@ -63,31 +62,21 @@ public class Country implements Comparable<Country> {
     }
     
     public void draw(Graphics g) {
-        Color color;
         if (selected) {
-            color = Board.colors[ownerID].darker();
-        } else {
-            color = Board.colors[ownerID];
-        }
-        g.setColor(color);
+            Color highlighted = g.getColor().darker();
+            g.setColor(highlighted);
+        } 
+        //g.setColor(color);
         g.fillRect(x, y, width, height);
         g.setColor(Color.BLACK);
         g.drawRect(x, y, width, height);
-        if (showName) {
-            g.drawString(name, x, y + height / 2);
-        } else {
-            int offset = 3;
-            if (numSoldiers >= 10) {
-                offset = 7;
-            }
-            g.drawString("" + numSoldiers, x - offset + width / 2, y + 4 + height / 2);
+        int offset = 3;
+        if (numSoldiers >= 10) {
+            offset = 7;
         }
+        g.drawString("" + numSoldiers, x - offset + width / 2, y + 4 + height / 2);
     }
-    
-    public void toggleNameOrNum() {
-        showName = !showName;
-    }
-    
+
     public void highlight() {
         selected = true;
     }
@@ -103,7 +92,7 @@ public class Country implements Comparable<Country> {
         if (mouseX < x || mouseX > x + width) {
             return false;
         }
-        if (mouseY > y + height || mouseY < y) {
+        if (mouseY < y || mouseY > y + height ) {
             return false;
         }
         return true;

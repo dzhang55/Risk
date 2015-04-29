@@ -19,57 +19,51 @@ import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
 public class Board extends JPanel{
-    private static ArrayList<Set<Country>> continents;
-    private static ArrayList<Integer[]> playerDecks;
-    private static List<Integer> deck;
+    private static List<Set<Country>> continents;
+    //private static ArrayList<Integer[]> playerDecks;
     private static final int[] continentBonuses = {5, 2, 5, 3, 7, 2};
     static Country[] countries;
     public static final int BOARD_WIDTH = 900;
     public static final int BOARD_HEIGHT = 600;
     public static final Color[] colors = {Color.BLUE, Color.RED, Color.YELLOW, Color.GREEN, 
-                                          Color.GRAY, Color.MAGENTA};
-    private static int currPlayer = 0;
-   // private static ArrayList<Player> players;
+        Color.ORANGE, Color.MAGENTA};
+    private static int turn = 0;
+    // private static ArrayList<Player> players;
     private static int troopsToPlace;
-    private static int numPlayers;
     private static Country selectedCountry;
     private static Country selectedSecondCountry;
     private final JLabel turnInfo;
     private final JLabel[] cardInfo;
-    private Set<Integer> deadIDs;
-    //private static Map<Integer, Set<Country>> idToCountriesOwned;
-    
-    
+    private static Player[] players;
+
     enum Mode {
         UseCardMode, InitialPlacingMode, PlacingMode, AttackFromMode, AttackToMode, 
         KeepAttackingMode, NewCountryMode, FortifyFromMode, FortifyToMode, 
         KeepFortifyingMode, GameOverMode;
     }
-    
+
     private Mode mode = Mode.InitialPlacingMode;
-    
-    public Board(final JLabel turnInfo, final JLabel[] cardInfo) {
-        
+
+    public Board(final JLabel turnInfo, final JLabel[] cardInfo, int numPlayers) {
+
         this.turnInfo = turnInfo;
         this.cardInfo = cardInfo;
-        deadIDs = new TreeSet<Integer>();
-        
+
         initializeCountries();   
         initializeContinents();
-        
-        
-        // change this later
-        numPlayers = 4;
-
+        initializePlayers(numPlayers);
         initialCountryOwners(numPlayers);
-        initialDecks();
+        Player.initialDeck();
         initialTroopsToPlace();
         
+        setCardLabels();
+
         turnInfo.setText(getStringForMode());
 
         addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 Point mouse = e.getPoint();
+
                 switch (mode) {
                 case UseCardMode:
                     break;
@@ -108,6 +102,7 @@ public class Board extends JPanel{
                 case GameOverMode:
                     break;
                 }
+                setCardLabels();
                 turnInfo.setText(getStringForMode());
                 repaint();
             }
@@ -115,7 +110,14 @@ public class Board extends JPanel{
         });
 
     }
-    
+
+    private void initializePlayers(int numPlayers) {
+        players = new Player[numPlayers];
+        for (int i = 0; i < numPlayers; i++) {
+            players[i] = new Player();
+        }
+    }
+
 
     /* creates the ArrayList of Set<Country> that represents continents
      * necessary for checking continent bonuses
@@ -131,38 +133,38 @@ public class Board extends JPanel{
         for (int i = 0; i < 9; i++) {
             thisContinent.add(countries[i]);
         }
-        
+
         // South America
         thisContinent = continents.get(1);
         for (int i = 9; i < 13; i++) {
             thisContinent.add(countries[i]);
         }
-        
+
         // Europe
         thisContinent = continents.get(2);
         for (int i = 13; i < 20; i++) {
             thisContinent.add(countries[i]);
         }
-        
+
         // Africa
         thisContinent = continents.get(3);
         for (int i = 20; i < 26; i++) {
             thisContinent.add(countries[i]);
         }
-        
+
         // Asia
         thisContinent = continents.get(4);
         for (int i = 26; i < 38; i++) {
             thisContinent.add(countries[i]);
         }
-        
+
         // Australia
         thisContinent = continents.get(5);
         for (int i = 38; i < 42; i++) {
             thisContinent.add(countries[i]);
         }
     }
-    
+
     /* initializes the 42 countries that make up the standard risk map
      */
     private void initializeCountries() {
@@ -209,90 +211,90 @@ public class Board extends JPanel{
         countries[39] = new Country("Western Australia", 740, 360, 60, 70);
         countries[40] = new Country("Eastern Australia", 800, 360, 50, 70);
         countries[41] = new Country("New Guinea", 800, 310, 40, 25);
-        
+
         countries[0].adjacentCountries = new TreeSet<Country>();
         countries[0].adjacentCountries.add(countries[1]);
         countries[0].adjacentCountries.add(countries[5]);
         countries[0].adjacentCountries.add(countries[36]);
-        
+
         countries[1].adjacentCountries = new TreeSet<Country>();
         countries[1].adjacentCountries.add(countries[5]);
         countries[1].adjacentCountries.add(countries[6]);
         countries[1].adjacentCountries.add(countries[8]);
-        
+
         countries[2].adjacentCountries = new TreeSet<Country>();
         countries[2].adjacentCountries.add(countries[3]);
         countries[2].adjacentCountries.add(countries[8]);
         countries[2].adjacentCountries.add(countries[9]);
-        
+
         countries[3].adjacentCountries = new TreeSet<Country>();
         countries[3].adjacentCountries.add(countries[6]);
         countries[3].adjacentCountries.add(countries[7]);
         countries[3].adjacentCountries.add(countries[8]);
-        
+
         countries[4].adjacentCountries = new TreeSet<Country>();
         countries[4].adjacentCountries.add(countries[5]);
         countries[4].adjacentCountries.add(countries[6]);
         countries[4].adjacentCountries.add(countries[7]);
         countries[4].adjacentCountries.add(countries[14]);
-        
+
         countries[5].adjacentCountries = new TreeSet<Country>();
         countries[5].adjacentCountries.add(countries[6]);
-        
+
         countries[6].adjacentCountries = new TreeSet<Country>();
         countries[6].adjacentCountries.add(countries[7]);
         countries[6].adjacentCountries.add(countries[8]);
-        
+
         countries[7].adjacentCountries = new TreeSet<Country>();
-        
+
         countries[8].adjacentCountries = new TreeSet<Country>();
-        
+
         countries[9].adjacentCountries = new TreeSet<Country>();
         countries[9].adjacentCountries.add(countries[10]);
         countries[9].adjacentCountries.add(countries[11]);
-        
+
         countries[10].adjacentCountries = new TreeSet<Country>();
         countries[10].adjacentCountries.add(countries[11]);
         countries[10].adjacentCountries.add(countries[12]);
         countries[10].adjacentCountries.add(countries[22]);
-        
+
         countries[11].adjacentCountries = new TreeSet<Country>();
         countries[11].adjacentCountries.add(countries[12]);
 
         countries[12].adjacentCountries = new TreeSet<Country>();
-        
+
         countries[13].adjacentCountries = new TreeSet<Country>();
         countries[13].adjacentCountries.add(countries[14]);
         countries[13].adjacentCountries.add(countries[15]);
         countries[13].adjacentCountries.add(countries[16]);
         countries[13].adjacentCountries.add(countries[19]);
-        
+
         countries[14].adjacentCountries = new TreeSet<Country>();
-        
+
         countries[15].adjacentCountries = new TreeSet<Country>();
         countries[15].adjacentCountries.add(countries[16]);
         countries[15].adjacentCountries.add(countries[17]);
         countries[15].adjacentCountries.add(countries[18]);
         countries[15].adjacentCountries.add(countries[19]);
-        
+
         countries[16].adjacentCountries = new TreeSet<Country>();
         countries[16].adjacentCountries.add(countries[17]);
-        
+
         countries[17].adjacentCountries = new TreeSet<Country>();
         countries[17].adjacentCountries.add(countries[18]);
         countries[17].adjacentCountries.add(countries[26]);
         countries[17].adjacentCountries.add(countries[27]);
         countries[17].adjacentCountries.add(countries[28]);
-        
+
         countries[18].adjacentCountries = new TreeSet<Country>();
         countries[18].adjacentCountries.add(countries[19]);
         countries[18].adjacentCountries.add(countries[21]);
         countries[18].adjacentCountries.add(countries[22]);
         countries[18].adjacentCountries.add(countries[26]);
-        
+
         countries[19].adjacentCountries = new TreeSet<Country>();
         countries[19].adjacentCountries.add(countries[22]);
-        
+
         countries[20].adjacentCountries = new TreeSet<Country>();
         countries[20].adjacentCountries.add(countries[23]);
         countries[20].adjacentCountries.add(countries[25]);
@@ -301,7 +303,7 @@ public class Board extends JPanel{
         countries[21].adjacentCountries.add(countries[22]);
         countries[21].adjacentCountries.add(countries[23]);
         countries[21].adjacentCountries.add(countries[26]);
-        
+
         countries[22].adjacentCountries = new TreeSet<Country>();
         countries[22].adjacentCountries.add(countries[23]);
         countries[22].adjacentCountries.add(countries[24]);
@@ -313,7 +315,7 @@ public class Board extends JPanel{
 
         countries[24].adjacentCountries = new TreeSet<Country>();
         countries[24].adjacentCountries.add(countries[25]);
-        
+
         countries[25].adjacentCountries = new TreeSet<Country>();
 
         countries[26].adjacentCountries = new TreeSet<Country>();
@@ -350,7 +352,7 @@ public class Board extends JPanel{
         countries[33].adjacentCountries.add(countries[34]);
         countries[33].adjacentCountries.add(countries[36]);
         countries[33].adjacentCountries.add(countries[37]);
-        
+
         countries[34].adjacentCountries = new TreeSet<Country>();
         countries[34].adjacentCountries.add(countries[35]);
         countries[34].adjacentCountries.add(countries[36]);
@@ -366,16 +368,16 @@ public class Board extends JPanel{
         countries[38].adjacentCountries = new TreeSet<Country>();
         countries[38].adjacentCountries.add(countries[39]);
         countries[38].adjacentCountries.add(countries[41]);
-        
+
         countries[39].adjacentCountries = new TreeSet<Country>();
         countries[39].adjacentCountries.add(countries[40]);
         countries[39].adjacentCountries.add(countries[41]);
-        
+
         countries[40].adjacentCountries = new TreeSet<Country>();
         countries[40].adjacentCountries.add(countries[41]);
-        
+
         countries[41].adjacentCountries = new TreeSet<Country>();
-        
+
         for (int i = 0; i < countries.length; i++) {
             for (Country c : countries[i].adjacentCountries) {
                 c.adjacentCountries.add(countries[i]);
@@ -383,7 +385,7 @@ public class Board extends JPanel{
         }
 
     }
-    
+
     /* creates a shuffled array of countries
      */
     private Country[] shuffleCountries() {
@@ -396,16 +398,7 @@ public class Board extends JPanel{
         }
         return shuffledCountries;
     }
-    
-    private void initialCountryOwnersTEST(int numPlayers) {
-        countries[0].ownerID = 1;
-        countries[1].ownerID = 2;
-        countries[2].ownerID = 3;
-        for (int i = 3; i < countries.length; i++) {
-            countries[i].ownerID = 0;
-        }
-    }
-    
+
     /* iterates through a shuffled array of countries to randomly
      * assign owners to countries
      * @param numPlayers the number of players
@@ -414,32 +407,18 @@ public class Board extends JPanel{
         int playerID = 0;
         Country[] shuffledCountries = shuffleCountries();
         for (int i = 0; i < countries.length; i++) {
-            shuffledCountries[i].ownerID = playerID;
+            players[playerID].countriesOwned.add(shuffledCountries[i]);
             playerID = (playerID + 1) % numPlayers;
         }
     }
-    
-    private void initialDecks() {
-        playerDecks = new ArrayList<Integer[]>();
-        for (int i = 0; i < numPlayers; i++) {
-            playerDecks.add(i, new Integer[4]);
-        }
-        deck = new LinkedList<Integer>();
-        for (int i = 0; i < 14; i++) {
-            deck.add(0);
-            deck.add(1);
-            deck.add(2);
-        }
-        deck.add(3);
-        deck.add(3);
-    }
+
     /* draws the connecting lines for countries that are adjacent
      * but not visibly so
      */
     private void drawLines(Graphics g) {
         g.drawLine(0, 60, 30, 60);
         g.drawLine(800, 60, 900, 60);
-        
+
         g.drawLine(230, 55, 280, 50);
         g.drawLine(250, 80, 280, 50);
         g.drawLine(300, 90, 310, 80);
@@ -464,28 +443,23 @@ public class Board extends JPanel{
         g.drawLine(820, 335, 825, 360);
         g.drawLine(770, 360, 800, 335);
     }
-    
-    private boolean checkDead(int player) {
-        for (int i = 0; i < countries.length; i++) {
-            if (countries[i].ownerID == player) {
-                return false;
-            }
-        }
-        return true;
-    }
-    
+
+    /* ends the game if only one player is remaining
+     */
     private void checkWin() {
-        if (deadIDs.size() == numPlayers - 1) {
-            for (int i = 0; i < numPlayers; i++) {
-                if (!deadIDs.contains(i)) {
-                    mode = Mode.GameOverMode;
-                    turnInfo.setText(getStringForMode());
-                    repaint();
-                }
+        int numDead = 0;
+        for (Player p : players) {
+            if (p.dead) {
+                numDead++;
             }
         }
+        if (numDead == players.length - 1) {
+            mode = Mode.GameOverMode;
+            turnInfo.setText(getStringForMode());
+            repaint();
+        }
     }
-    
+
     /* places soldier in a country provided the current player owns the country
      * moves on to next mode after all soldiers have been placed
      * @param: mouse for the mouse click location
@@ -495,99 +469,90 @@ public class Board extends JPanel{
             System.out.println("this shouldn't happen");
             nextMode();
         }
-        for (Country c : countries) {
-            if (c.inBounds(mouse) && c.ownerID == currPlayer) {
+        for (Country c : players[turn].countriesOwned) {
+            if (c.inBounds(mouse)) {
                 c.numSoldiers++;
                 troopsToPlace--;
             }
         }
         if (troopsToPlace == 0) {
             if (mode == Mode.InitialPlacingMode){
-                currPlayer++;
-                initialTroopsToPlace();
-                if (currPlayer == numPlayers) {
-                    currPlayer = 0;
+                turn++;
+                if (turn == players.length) {
+                    turn = 0;
                     updateTroopsToPlace();
-                    nextMode();
+                    nextMode();  
+                } else {
+                    initialTroopsToPlace();
                 }
             } else {
                 nextMode();
             }
         }
     }
-    
+
     /* calculates the initial troops for a player to place
      */
     private void initialTroopsToPlace() {
-        int countriesOwned = 0;
-        for (int i = 0; i < countries.length; i++) {
-            if (countries[i].ownerID == currPlayer) {
-                countriesOwned++;
-            }
-        }
-        troopsToPlace = 40 - countriesOwned - (numPlayers - 2) * 5;
+
+        int countriesOwned = players[turn].countriesOwned.size();
+        troopsToPlace = 40 - countriesOwned - (players.length - 2) * 5;
     }
     /* return true if current player owns the continent, false otherwise
      * @param continent index for continent 
      */
     private boolean continentOwned(int continent) {
         for (Country c : continents.get(continent)) {
-            if (c.ownerID != currPlayer) {
+            if (!players[turn].countriesOwned.contains(c)) {
                 return false;
             }
         }
         return true;
     }
-    
+
     /* calculates the number of troops a player can place at 
      * the beginning of his/her turn
      */
     private void updateTroopsToPlace() {
-        int numCountries = 0;
-        for (int i = 0; i < Board.countries.length; i++) {
-            if (Board.countries[i].ownerID == currPlayer) {
-                numCountries++;
-            }
-        }
-        int countryBonus = numCountries / 3;
-        
+
+        int countryBonus = players[turn].countriesOwned.size() / 3;
+        troopsToPlace = Math.max(3, countryBonus);
+
         for (int i = 0; i < Board.continentBonuses.length; i++) {
             if (continentOwned(i)) {
-                countryBonus += continentBonuses[i];
+                troopsToPlace += continentBonuses[i];
             }
         }
-        troopsToPlace = Math.max(3, countryBonus);
     }
-    
-    
+
+
     /* selects a country and stores it given that the current player owns it
      * @param mouse for the mouse click location
      */
     private void selectOwnerCountry(Point mouse) {
-        for (Country c : countries) {
+        for (Country c : players[turn].countriesOwned) {
             boolean enoughSoldiers = (mode == Mode.AttackFromMode && c.numSoldiers > 1) || 
-                                      mode == Mode.FortifyFromMode;
-            if (c.inBounds(mouse) && c.ownerID == currPlayer && enoughSoldiers) {
+                    mode == Mode.FortifyFromMode;
+            if (c.inBounds(mouse) && enoughSoldiers) {
                 selectedCountry = c;
                 nextMode();
             }
         }
     }
-    
+
     /* selects a country and stores it given that the current player does not own it
      * @param mouse for the mouse click location
      */
     private void selectEnemyCountry(Point mouse) {
-        
+
         // unselect the country to attack from
         if (selectedCountry.inBounds(mouse)) {
             selectedCountry = null;
             mode = Mode.AttackFromMode;
             return;
         }
-        for (Country c : countries) {
-            if (c.inBounds(mouse) && c.ownerID != currPlayer && 
-                    selectedCountry.adjacentCountries.contains(c)) {
+        for (Country c : selectedCountry.adjacentCountries) {
+            if (c.inBounds(mouse) && !players[turn].countriesOwned.contains(c)) {
                 selectedSecondCountry = c;
                 attack(selectedCountry, selectedSecondCountry);
                 checkOutcome();
@@ -597,7 +562,7 @@ public class Board extends JPanel{
             }
         }
     }
-    
+
     /* simulates the dice rolling for an attack
      * number of dice is dependent on available soldiers
      * @param own for the attacking country
@@ -656,8 +621,8 @@ public class Board extends JPanel{
         }
 
     }
-    
-    
+
+
     /* checks the number of available soldiers to see if a battle is over
      */
     private void checkOutcome() {
@@ -672,6 +637,11 @@ public class Board extends JPanel{
             return;
         }
         if (selectedSecondCountry.numSoldiers == 0) {
+            if (!Player.wonCardAlready) {
+                players[turn].winCard();
+                Player.wonCardAlready = true;
+            }
+
             if (mode == Mode.AttackToMode) {
                 nextMode();
             }
@@ -679,21 +649,30 @@ public class Board extends JPanel{
             conquer();
         }
     }
-    
+
     /* takes all the troops remaining after a conquest and allow them to be placed
      */
     private void conquer() {
-        int loser = selectedSecondCountry.ownerID;
-        selectedSecondCountry.ownerID = currPlayer;
-        if (checkDead(loser)) {
-            deadIDs.add(loser);
-            System.out.println((loser + 1) + "dead");
+        Player enemy = null;
+        for (Player p : players) {
+            if (p.countriesOwned.contains(selectedSecondCountry)) {
+                enemy = p;
+            }
+        }
+        enemy.countriesOwned.remove(selectedSecondCountry);
+        players[turn].countriesOwned.add(selectedSecondCountry);
+        
+        if (enemy.countriesOwned.isEmpty()) {
+            enemy.dead = true;
+            for (int i = 0; i < enemy.cards.length; i++) {
+                players[turn].cards[i] += enemy.cards[i];
+            }
         }
         checkWin();
         selectedSecondCountry.numSoldiers = 1;
         troopsToPlace = selectedCountry.numSoldiers - 2;
         selectedCountry.numSoldiers = 1;
-        
+
         // deal with edge case where there are no remaining soldiers right after a conquest
         if (troopsToPlace == 0) {
             selectedCountry = null;
@@ -701,13 +680,13 @@ public class Board extends JPanel{
             nextMode();
         }
     }
-    
+
     /* place a soldier in a newly conquered country 
      * if there are no more soldiers, move on to the next mode
      * @param mouse for the mouse click location
      */
     private void placeSoldierNewCountry(Point mouse) {
-       
+
         if (selectedCountry.inBounds(mouse)) {
             troopsToPlace--;
             selectedCountry.numSoldiers++;
@@ -716,7 +695,7 @@ public class Board extends JPanel{
             troopsToPlace--;
             selectedSecondCountry.numSoldiers++;
         }
-        
+
         if (troopsToPlace == 0) {
             selectedCountry = null;
             selectedSecondCountry = null;
@@ -733,17 +712,16 @@ public class Board extends JPanel{
             mode = Mode.FortifyFromMode;
             return;
         }
-        
-        for (Country c : countries) {
-            if (c.inBounds(mouse) && c.ownerID == currPlayer && 
-                    selectedCountry.adjacentCountries.contains(c)) {
+
+        for (Country c : selectedCountry.adjacentCountries) {
+            if (c.inBounds(mouse) && players[turn].countriesOwned.contains(c)) {
                 selectedSecondCountry = c;
                 fortify();
                 nextMode();
             }
         } 
     }
-    
+
     /* fortifies a soldier from one country to another
      * if there are no more soldiers available, move on to next mode
      */
@@ -754,26 +732,23 @@ public class Board extends JPanel{
         }
         selectedCountry.numSoldiers--;
         selectedSecondCountry.numSoldiers++;
-        
+
         // immediately switch to next mode if no longer possible to fortify
         if (selectedCountry.numSoldiers == 1) {
             nextMode();
         }
-    }
-    
-    private boolean ownsSet() {
-        //Integer[] currPlayerDeck = playerDecks.get(currPlayer);
-        //FINISH THIS 
-        return false;
     }
 
     /* returns a String that contains information
      * on the game state
      */
     public String getStringForMode() {
-        String init = "Player " + (currPlayer + 1) + ": ";
+        String init = "Player " + (turn + 1) + ": ";
         switch(mode) {
         case UseCardMode:
+            if (players[turn].fullHand()) {
+                return init + "You have a full hand. You must use a set.";
+            }
             return init + "Would you like to use your cards?";
         case InitialPlacingMode:
             return init + "Welcome to Risk! Place troops: " + troopsToPlace + " remaining";
@@ -785,28 +760,30 @@ public class Board extends JPanel{
             return init + "Choose country to attack: " + selectedCountry.getName() + " -> ___";
         case KeepAttackingMode:
             return init + "Keep Attacking? " + selectedCountry.getName() + 
-                   " -> " + selectedSecondCountry.getName();
+                    " -> " + selectedSecondCountry.getName();
         case NewCountryMode:
             return init + "You successfully conquered " + selectedSecondCountry.getName() + 
-                   "! Add troops to your new or old country: " + troopsToPlace + " remaining";
+                    "! Add troops to your new or old country: " + troopsToPlace + " remaining";
         case FortifyFromMode:
             return init + "Choose country to fortify from: ___ -> ___";
         case FortifyToMode:
             return init + "Choose country to fortify: " + selectedCountry.getName() + " -> ___";
         case KeepFortifyingMode:
             return init + "Continue to fortify " + selectedCountry.getName() + " -> " +
-                   selectedSecondCountry.getName() + "?";
+            selectedSecondCountry.getName() + "?";
         case GameOverMode:
-            return init + " wins!!!";
+            return init + "You won!!!";
         default:
             return "did you just break this game why";
         }
     }
-    
+
     public void next() {
         switch(mode) {
         case UseCardMode:
-            nextMode();
+            if (!players[turn].fullHand()) {
+                nextMode();
+            }
             break;
         case InitialPlacingMode:
             break;
@@ -843,20 +820,25 @@ public class Board extends JPanel{
         turnInfo.setText(getStringForMode());
         repaint();
     }
-    
+
     private void nextPlayer() {
         selectedCountry = null;
         selectedSecondCountry = null;
-        currPlayer = (currPlayer + 1) % numPlayers;
-        while (deadIDs.contains(currPlayer)) {
-            currPlayer = (currPlayer + 1) % numPlayers;
+        Player.wonCardAlready = false;
+        turn = (turn + 1) % players.length;
+        while (players[turn].dead) {
+            turn = (turn + 1) % players.length;
         }
-        if (ownsSet()) {
+        if (players[turn].hasSet()) {
             mode = Mode.UseCardMode;
         } else {
             mode = Mode.PlacingMode;
         }
         updateTroopsToPlace();
+        String[] cardLabels = players[turn].StringOfCards();
+        for (int i = 0; i < cardLabels.length; i++) {
+            cardInfo[i].setText(cardLabels[i]);    
+        }
     }
 
     /* iterates the mode to the next
@@ -898,21 +880,48 @@ public class Board extends JPanel{
             break;
         }
     }
+    
+    public void useCards() {
+        if (mode != Mode.UseCardMode) {
+            return;
+        }
+            int bonus = Player.cardBonus();
+            troopsToPlace += bonus;
+            turnInfo.setText("You just traded in a set for " + bonus + " soldiers!");
+            players[turn].useSet();
+            setCardLabels();
+            if (!players[turn].hasSet()) {
+                nextMode();
+            }
+
+    }
+    
+    public void setCardLabels() {
+        String[] cardLabels = players[turn].StringOfCards();
+        for (int i = 0; i < cardLabels.length; i++) {
+            cardInfo[i].setText(cardLabels[i]);    
+        }
+    }
 
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         g.setColor(new Color(25, 25, 154));
         g.fillRect(0, 0, BOARD_WIDTH, BOARD_HEIGHT);
-        for(Country c : countries) {
-            if (c == selectedCountry || c == selectedSecondCountry) {
-                c.highlight();
-            } else {
-                c.unhighlight();
+        for (int i = 0; i < players.length; i++) {
+            Player player = players[i];
+            for(Country c : player.countriesOwned) {
+                g.setColor(colors[i]);
+
+                if (c == selectedCountry || c == selectedSecondCountry) {
+                    c.highlight();
+                } else {
+                    c.unhighlight();
+                }
+                c.draw(g);   
             }
-            c.draw(g);   
+            drawLines(g);
         }
-        drawLines(g);
     }
 
     @Override

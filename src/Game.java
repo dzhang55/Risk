@@ -1,51 +1,93 @@
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.*;
 
 public class Game implements Runnable {
+    private int numPlayers;
+    
+    public void setnumPlayers(int x) {
+        numPlayers = x;
+    }
     
     public void run() {
+ //       final CardLayout layout = new CardLayout();
+        
         final JFrame frame = new JFrame("Risk");
-
-        final OverlayLayout overlay = new OverlayLayout(frame);
+        final Start startScreen = new Start();
+        
+        
+        frame.add(startScreen);
+        startScreen.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                int numPlayers = startScreen.selectPlayers(e);
+                if (numPlayers != -1) {
+                    startScreen.setVisible(false);
+                    startScreen.setEnabled(false);
+                    initializeGame(frame, numPlayers);
+                }
+            }
+            
+        });
+        
+        frame.pack();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setResizable(false);
+        frame.setVisible(true);    
+        
+    }
+    
+    private static void initializeGame(JFrame frame, int numPlayers) {
         
         final JPanel turnPanel = new JPanel();
-        frame.add(turnPanel, BorderLayout.SOUTH);
         final JLabel turnInfo = new JLabel();
         turnPanel.add(turnInfo);
         
-        
+        final JPanel statusPanel = new JPanel();
         final JPanel cardPanel = new JPanel();
-        cardPanel.setLayout(new GridLayout(4, 1));
-        final JLabel[] cardInfo = new JLabel[4];
+        cardPanel.setPreferredSize(new Dimension(100, 300));
+        statusPanel.setPreferredSize(new Dimension(100, 0));
+        
+        final JLabel[] cardInfo = new JLabel[8];
         for (int i = 0; i < cardInfo.length; i++) {
             cardInfo[i] = new JLabel();
+            cardPanel.add(cardInfo[i]);
         }
-        //statusPanel.add(cardInfo);
-       // statusPanel.add(done, BorderLayout.SOUTH);
-        final Board board = new Board(turnInfo, cardInfo);
+
+        final Board board = new Board(turnInfo, cardInfo, numPlayers);
         frame.add(board, BorderLayout.CENTER);
         
-        final JPanel statusPanel = new JPanel();
+        final JButton use = new JButton("Use");
+        use.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                board.useCards();
+            }
+        });
+        cardPanel.add(use);
+        
         final JButton next = new JButton("Next");
         next.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 board.next();
             }
         });
-        statusPanel.add(next, BorderLayout.NORTH);
+        statusPanel.add(next);
+        statusPanel.add(cardPanel, BorderLayout.SOUTH);
         
         frame.add(statusPanel, BorderLayout.WEST);
+        frame.add(turnPanel, BorderLayout.SOUTH);
         
-       // overlay.addLayoutComponent(done, constraints);
-
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
-        frame.setVisible(true);    
+        frame.setVisible(true);   
+
     }
     
     
