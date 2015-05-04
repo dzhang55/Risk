@@ -4,13 +4,9 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.*;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.swing.JLabel;
@@ -20,20 +16,22 @@ import javax.swing.JPanel;
 @SuppressWarnings("serial")
 public class Board extends JPanel{
     private static List<Set<Country>> continents;
-    //private static ArrayList<Integer[]> playerDecks;
     private static final int[] continentBonuses = {5, 2, 5, 3, 7, 2};
+    
     static Country[] countries;
     public static final int BOARD_WIDTH = 900;
     public static final int BOARD_HEIGHT = 600;
     public static final Color[] colors = {Color.BLUE, Color.RED, Color.YELLOW, Color.GREEN, 
-        Color.ORANGE, Color.MAGENTA};
+        Color.CYAN, Color.MAGENTA};
+    
     private static int turn = 0;
-    // private static ArrayList<Player> players;
+    
     private static int troopsToPlace;
     private static Country selectedCountry;
     private static Country selectedSecondCountry;
     private final JLabel turnInfo;
     private final JLabel[] cardInfo;
+    private final Dice diceInfo;
     private static Player[] players;
 
     enum Mode {
@@ -44,10 +42,11 @@ public class Board extends JPanel{
 
     private Mode mode = Mode.InitialPlacingMode;
 
-    public Board(final JLabel turnInfo, final JLabel[] cardInfo, int numPlayers) {
+    public Board(final JLabel turnInfo, final JLabel[] cardInfo, Dice diceInfo, int numPlayers) {
 
         this.turnInfo = turnInfo;
         this.cardInfo = cardInfo;
+        this.diceInfo = diceInfo;
 
         initializeCountries();   
         initializeContinents();
@@ -55,7 +54,7 @@ public class Board extends JPanel{
         initialCountryOwners(numPlayers);
         Player.initialDeck();
         initialTroopsToPlace();
-        
+
         setCardLabels();
 
         turnInfo.setText(getStringForMode());
@@ -465,10 +464,7 @@ public class Board extends JPanel{
      * @param: mouse for the mouse click location
      */
     private void placeSoldier(Point mouse) {
-        if (troopsToPlace == 0) {
-            System.out.println("this shouldn't happen");
-            nextMode();
-        }
+
         for (Country c : players[turn].countriesOwned) {
             if (c.inBounds(mouse)) {
                 c.numSoldiers++;
@@ -531,9 +527,7 @@ public class Board extends JPanel{
      */
     private void selectOwnerCountry(Point mouse) {
         for (Country c : players[turn].countriesOwned) {
-            boolean enoughSoldiers = (mode == Mode.AttackFromMode && c.numSoldiers > 1) || 
-                    mode == Mode.FortifyFromMode;
-            if (c.inBounds(mouse) && enoughSoldiers) {
+            if (c.inBounds(mouse) && c.numSoldiers > 1) {
                 selectedCountry = c;
                 nextMode();
             }
@@ -594,6 +588,7 @@ public class Board extends JPanel{
         if (die3 > midAtk) {
             maxAtk = die3;
             sndAtk = midAtk;
+            thirdAtk = Math.min(die1, die2);
         } else {
             maxAtk = midAtk;
             if (Math.min(die1, die2) > die3) {
@@ -619,9 +614,14 @@ public class Board extends JPanel{
                 own.numSoldiers--;
             }
         }
-
+        
+        diceInfo.dice[0].update(maxAtk);
+        diceInfo.dice[1].update(maxDef);
+        diceInfo.dice[2].update(sndAtk);
+        diceInfo.dice[3].update(sndDef);
+        diceInfo.dice[4].update(thirdAtk);
+        diceInfo.repaint();
     }
-
 
     /* checks the number of available soldiers to see if a battle is over
      */
@@ -661,7 +661,7 @@ public class Board extends JPanel{
         }
         enemy.countriesOwned.remove(selectedSecondCountry);
         players[turn].countriesOwned.add(selectedSecondCountry);
-        
+
         if (enemy.countriesOwned.isEmpty()) {
             enemy.dead = true;
             for (int i = 0; i < enemy.cards.length; i++) {
@@ -726,10 +726,6 @@ public class Board extends JPanel{
      * if there are no more soldiers available, move on to next mode
      */
     private void fortify() {
-        // edge case where initially it is 1
-        if (selectedCountry.numSoldiers == 1) {
-            nextMode();
-        }
         selectedCountry.numSoldiers--;
         selectedSecondCountry.numSoldiers++;
 
@@ -777,7 +773,10 @@ public class Board extends JPanel{
             return "did you just break this game why";
         }
     }
-
+    
+    /* Allows the player to move on to the next phase of the game
+     * This function is used by the Next button
+     */
     public void next() {
         switch(mode) {
         case UseCardMode:
@@ -794,12 +793,12 @@ public class Board extends JPanel{
             selectedCountry = null;
             break;
         case AttackToMode:
-            mode = Mode.AttackFromMode;
+            mode = Mode.FortifyFromMode;
             selectedCountry = null;
             selectedSecondCountry = null;
             break;
         case KeepAttackingMode:
-            mode = Mode.FortifyFromMode;
+            mode = Mode.AttackFromMode;
             selectedCountry = null;
             selectedSecondCountry = null;
             break;
@@ -817,10 +816,14 @@ public class Board extends JPanel{
         case GameOverMode:
             break;    
         }
+        setCardLabels();
         turnInfo.setText(getStringForMode());
         repaint();
     }
 
+    /* increments the turn to the next living player and resets all of the
+     * board state information to the current player
+     */
     private void nextPlayer() {
         selectedCountry = null;
         selectedSecondCountry = null;
@@ -835,10 +838,6 @@ public class Board extends JPanel{
             mode = Mode.PlacingMode;
         }
         updateTroopsToPlace();
-        String[] cardLabels = players[turn].StringOfCards();
-        for (int i = 0; i < cardLabels.length; i++) {
-            cardInfo[i].setText(cardLabels[i]);    
-        }
     }
 
     /* iterates the mode to the next
@@ -880,22 +879,28 @@ public class Board extends JPanel{
             break;
         }
     }
-    
+
+    /* Uses a set of the player's cards and updates the number of troops they
+     * can place accordingly
+     * This function is used by the Use button
+     */
     public void useCards() {
         if (mode != Mode.UseCardMode) {
             return;
         }
-            int bonus = Player.cardBonus();
-            troopsToPlace += bonus;
-            turnInfo.setText("You just traded in a set for " + bonus + " soldiers!");
-            players[turn].useSet();
-            setCardLabels();
-            if (!players[turn].hasSet()) {
-                nextMode();
-            }
+        int bonus = Player.cardBonus();
+        troopsToPlace += bonus;
+        turnInfo.setText("You just traded in a set for " + bonus + " soldiers!");
+        players[turn].useSet();
+        setCardLabels();
+        if (!players[turn].hasSet()) {
+            nextMode();
+        }
 
     }
-    
+
+    /* updates the text displaying the card status
+     */
     public void setCardLabels() {
         String[] cardLabels = players[turn].StringOfCards();
         for (int i = 0; i < cardLabels.length; i++) {
@@ -920,8 +925,8 @@ public class Board extends JPanel{
                 }
                 c.draw(g);   
             }
-            drawLines(g);
         }
+        drawLines(g);
     }
 
     @Override

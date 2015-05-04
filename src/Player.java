@@ -1,14 +1,11 @@
-import java.awt.Color;
-import java.awt.Graphics;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.swing.JLabel;
-
-
+/* Player object which represents the information pertaining to
+ * a player in the game
+ */
 public class Player {
     int[] cards;
     Set<Country> countriesOwned;

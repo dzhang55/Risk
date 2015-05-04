@@ -1,14 +1,15 @@
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
-import java.util.List;
 import java.util.Set;
 
+/* Country object which represents the information pertaining
+ * to a country in the game
+ */
 public class Country implements Comparable<Country> {
     Set<Country> adjacentCountries;
     private String name;
-    int ownerID;
+
     int numSoldiers;
     private int x;
     private int y;
@@ -32,27 +33,11 @@ public class Country implements Comparable<Country> {
     public int getX() {
         return x;
     }
-    
-    public int getRightX() {
-        return x + width;
-    }
-    
-    public int getCenterX() {
-        return x + width / 2;
-    }
 
     public int getY() {
         return y;
     }
-    
-    public int getBottomY() {
-        return y + height;
-    }
-
-    public int getCenterY() {
-        return y + height / 2;
-    }
-    
+ 
     public int getWidth() {
         return width;
     }
@@ -61,12 +46,13 @@ public class Country implements Comparable<Country> {
         return height;
     }
     
+    /* draws the country and displays the number of soldiers
+     */
     public void draw(Graphics g) {
         if (selected) {
             Color highlighted = g.getColor().darker();
             g.setColor(highlighted);
         } 
-        //g.setColor(color);
         g.fillRect(x, y, width, height);
         g.setColor(Color.BLACK);
         g.drawRect(x, y, width, height);
