@@ -79,10 +79,7 @@ public class Board extends JPanel{
                     selectEnemyCountry(mouse);
                     break;
                 case KeepAttackingMode:
-                    if (selectedSecondCountry.inBounds(mouse)) {
-                        attack(selectedCountry, selectedSecondCountry);
-                        checkOutcome();
-                    }
+                    keepAttacking(mouse);
                     break;
                 case NewCountryMode:
                     placeSoldierNewCountry(mouse);
@@ -556,6 +553,26 @@ public class Board extends JPanel{
             }
         }
     }
+    
+    /* sorts an array using insertion sort
+     */
+    private void insertSort(int[] arr) {
+        for (int i = 1; i < arr.length; i++) {
+            for (int j = i; j > 0; j--) {
+                if (arr[j] > arr[j - 1]) {
+                    int temp = arr[j];
+                    arr[j] = arr[j - 1];
+                    arr[j - 1] = temp;
+                }
+            }
+        }
+    }
+    
+    /* returns a random int from 1-6
+     */
+    private int roll() {
+        return (int) Math.ceil(6 * Math.random());
+    }
 
     /* simulates the dice rolling for an attack
      * number of dice is dependent on available soldiers
@@ -563,63 +580,38 @@ public class Board extends JPanel{
      * @param enemy for the defending country
      */
     private void attack(Country own, Country enemy) {
-        int die2 = 0;
-        int die3 = 0;
-        int defDie2 = 0;
-
-        int die1 = (int) Math.ceil(6 * Math.random());
-        int defDie1 = (int) Math.ceil(6 * Math.random());
-
-        if (own.numSoldiers > 2) {
-            die2 = (int) Math.ceil(6 * Math.random());
-            if (own.numSoldiers > 3) {
-                die3 = (int) Math.ceil(6 * Math.random());
-            }
+        int[] atkDice = new int[3];
+        int[] defDice = new int[2];
+        
+        for (int i = 0; i < Math.min(atkDice.length, own.numSoldiers - 1); i++) {
+            atkDice[i] = roll();
         }
-        if (enemy.numSoldiers > 1) {
-            defDie2 = (int) Math.ceil(6 * Math.random());
+        
+        for (int i = 0; i < Math.min(defDice.length, enemy.numSoldiers); i++) {
+            defDice[i] = roll();
         }
-
-        int maxAtk = 0;
-        int sndAtk = 0;;
-        int thirdAtk = 0;
-
-        int midAtk = Math.max(die1, die2);
-        if (die3 > midAtk) {
-            maxAtk = die3;
-            sndAtk = midAtk;
-            thirdAtk = Math.min(die1, die2);
-        } else {
-            maxAtk = midAtk;
-            if (Math.min(die1, die2) > die3) {
-                sndAtk = Math.min(die1, die2);
-                thirdAtk = die3;
-            } else {
-                sndAtk = die3;
-                thirdAtk = Math.min(die1, die2);
-            } 
-        }
-
-        int maxDef = Math.max(defDie1, defDie2);
-        if (maxAtk > maxDef) {
+        
+        insertSort(atkDice);
+        insertSort(defDice);
+        
+        if (atkDice[0] > defDice[0]) {
             enemy.numSoldiers--;
         } else {
             own.numSoldiers--;
         }
-        int sndDef = Math.min(defDie1, defDie2);
-        if (own.numSoldiers > 2 && enemy.numSoldiers > 1) {
-            if (sndAtk > sndDef) {
+        if (atkDice[1] != 0 && defDice[1] != 0) {
+            if (atkDice[1] > defDice[1] && atkDice[1] != 0 && defDice[1] != 0) {
                 enemy.numSoldiers--;
             } else {
                 own.numSoldiers--;
             }
         }
         
-        diceInfo.dice[0].update(maxAtk);
-        diceInfo.dice[1].update(maxDef);
-        diceInfo.dice[2].update(sndAtk);
-        diceInfo.dice[3].update(sndDef);
-        diceInfo.dice[4].update(thirdAtk);
+        diceInfo.dice[0].update(atkDice[0]);
+        diceInfo.dice[1].update(defDice[0]);
+        diceInfo.dice[2].update(atkDice[1]);
+        diceInfo.dice[3].update(defDice[1]);
+        diceInfo.dice[4].update(atkDice[2]);
         diceInfo.repaint();
     }
 
@@ -629,11 +621,7 @@ public class Board extends JPanel{
         if (selectedCountry.numSoldiers == 1) {
             selectedCountry = null;
             selectedSecondCountry = null;
-            if (mode == Mode.AttackToMode) {
-                nextMode();
-            }
-            nextMode();
-            nextMode();
+            mode = Mode.AttackFromMode;
             return;
         }
         if (selectedSecondCountry.numSoldiers == 0) {
@@ -642,12 +630,26 @@ public class Board extends JPanel{
                 Player.wonCardAlready = true;
             }
 
-            if (mode == Mode.AttackToMode) {
-                nextMode();
-            }
-            nextMode();
+            mode = Mode.NewCountryMode;
             conquer();
         }
+    }
+    
+    private void keepAttacking(Point mouse) {
+        
+        // unselect the country to attack from
+        if (selectedCountry.inBounds(mouse)) {
+            selectedCountry = null;
+            selectedSecondCountry = null;
+            mode = Mode.AttackFromMode;
+            return;
+        }
+        
+        if (selectedSecondCountry.inBounds(mouse)) {
+            attack(selectedCountry, selectedSecondCountry);
+            checkOutcome();
+        }
+        
     }
 
     /* takes all the troops remaining after a conquest and allow them to be placed

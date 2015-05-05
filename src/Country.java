@@ -75,10 +75,10 @@ public class Country implements Comparable<Country> {
         int mouseX = (int) mouse.getX();
         int mouseY = (int) mouse.getY();
         
-        if (mouseX < x || mouseX > x + width) {
+        if (mouseX < x + 1 || mouseX > x + width - 1) {
             return false;
         }
-        if (mouseY < y || mouseY > y + height ) {
+        if (mouseY < y + 1 || mouseY > y + height - 1) {
             return false;
         }
         return true;
