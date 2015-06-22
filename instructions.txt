@@ -1,0 +1,22 @@
+Welcome to Risk!
+Risk is a multiplayer board game in which players fight towards the goal of world domination! The board consists of 42 territories spread over 6 continents - the players must fight for control of these territories using their troops. Each player’s turn has three main phases:
+Reinforcements: At the beginning of your turn, you receive a certain number of reinforcements determined by the number of territories owned, bonuses for owning entire continents, and redeeming Risk cards (either 3 of a kind or 1 of each kind). These reinforcements may be placed in any of your countries. 
+
+Attacking: You may choose to attack from one of your countries to an adjacent enemy country. Attacking is simulated by 1-3 attacking dice and 1-2 defending dice. The top 2 (or 1 if there are not enough dice in the battle) dice are compared and the loser of each comparison loses a soldier (defender wins in the case of a tie). The number of dice depends on the number of armies available in the battle - e.g. a country with 3 soldiers must leave one behind in the country and so can only attack with 2 soldiers (2 dice). You can attack however many times you want in a turn. If you successfully conquer a country, you draw a Risk card (at most one per turn). One can have at most five Risk cards in hand. If a player loses all of his/her countries, the player is eliminated and all of his/her Risk cards go to the conqueror.
+
+Fortifying: At the end of a turn, you may choose to move armies from one of your countries to an adjacent country. 
+
+Click on countries to select them, and use the Next button to progress to the next phase of your turn.
+The Use button is for trading in cards for reinforcements.
+
+Continent Bonuses:
+North America 5
+South America 2
+Europe 5
+Africa 3
+Asia 7
+Australia 2
+
+
+
+
