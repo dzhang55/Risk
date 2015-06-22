@@ -22,8 +22,8 @@ public class Dice extends JPanel {
         try {
             for (int i = 0; i < diceImage.length; i++) {
                 String filename = "die" + i + ".png";
-                diceImage[i] = ImageIO.read(new File(filename));
-                redDiceImage[i] = ImageIO.read(new File("red" + filename));
+                diceImage[i] = ImageIO.read(new File("images/" + filename));
+                redDiceImage[i] = ImageIO.read(new File("images/red" + filename));
             }
         } catch (IOException e) {
             e.printStackTrace();

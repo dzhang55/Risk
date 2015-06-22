@@ -44,17 +44,17 @@ public class Start extends JPanel{
 
     public Start() {
         try {
-            risk = ImageIO.read(new File("risk.png"));
-            riskStart = ImageIO.read(new File("riskstart.png"));
-            riskRules = ImageIO.read(new File("riskrules.png"));
-            riskPlayers = ImageIO.read(new File("riskplayers.png"));
-            risk2Players = ImageIO.read(new File("risk2players.png"));
-            risk3Players = ImageIO.read(new File("risk3players.png"));
-            risk4Players = ImageIO.read(new File("risk4players.png"));
-            risk5Players = ImageIO.read(new File("risk5players.png"));
-            risk6Players = ImageIO.read(new File("risk6players.png"));
-            riskInstructions = ImageIO.read(new File("riskinstructions.png"));
-            riskInstructionsBack = ImageIO.read(new File("riskinstructionsback.png"));
+            risk = ImageIO.read(new File("images/risk.png"));
+            riskStart = ImageIO.read(new File("images/riskstart.png"));
+            riskRules = ImageIO.read(new File("images/riskrules.png"));
+            riskPlayers = ImageIO.read(new File("images/riskplayers.png"));
+            risk2Players = ImageIO.read(new File("images/risk2players.png"));
+            risk3Players = ImageIO.read(new File("images/risk3players.png"));
+            risk4Players = ImageIO.read(new File("images/risk4players.png"));
+            risk5Players = ImageIO.read(new File("images/risk5players.png"));
+            risk6Players = ImageIO.read(new File("images/risk6players.png"));
+            riskInstructions = ImageIO.read(new File("images/riskinstructions.png"));
+            riskInstructionsBack = ImageIO.read(new File("images/riskinstructionsback.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
