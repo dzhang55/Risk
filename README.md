@@ -1,3 +1,14 @@
+Risk
+=========
+
+This is a Java clone of the popular board game Risk, written for my final project for CIS120! It uses Swing to make a basic interface displaying the board, cards, dice, and implements all the standard Risk rules such as attacking, fortifying, using cards, getting continent bonuses, and so on.
+
+![](/images/startscreen.png)
+
+![](/images/game.png)
+
+##How it works
+
 Game:
 The runnable file, which initially displays a startScreen and adds a MouseListener that checks for if the player clicked on start (and selected a number of players). Then, it initializes the game by making status panels and the Board.
 
